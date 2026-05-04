@@ -155,12 +155,29 @@ class ExpenseTracker:
         except ValueError:
             return False, "Дата должна быть в формате ГГГГ-ММ-ДД (например, 2024-01-15)"
     
+    def validate_dates_range(self, start_date, end_date):
+        """Проверка, что начальная дата не позже конечной"""
+        if start_date and end_date:
+            try:
+                start = datetime.strptime(start_date, "%Y-%m-%d")
+                end = datetime.strptime(end_date, "%Y-%m-%d")
+                if start > end:
+                    return False, "Начальная дата не может быть позже конечной"
+            except ValueError:
+                return False, "Неверный формат даты"
+        return True, ""
+    
     def add_expense(self):
         """Добавление нового расхода"""
         # Получение данных
         amount_str = self.amount_entry.get().strip()
-        category = self.category_var.get()
+        category = self.category_var.get().strip()
         date_str = self.date_entry.get().strip()
+        
+        # Проверка, что категория не пустая
+        if not category:
+            messagebox.showerror("Ошибка", "Категория не может быть пустой")
+            return
         
         # Валидация суммы
         is_valid_amount, amount_result = self.validate_amount(amount_str)
@@ -257,6 +274,12 @@ class ExpenseTracker:
             if not is_valid:
                 messagebox.showerror("Ошибка", "Неверный формат конечной даты")
                 return self.expenses
+        
+        # Проверка диапазона дат
+        is_valid_range, error_msg = self.validate_dates_range(start_date, end_date)
+        if not is_valid_range:
+            messagebox.showerror("Ошибка", error_msg)
+            return self.expenses
         
         if start_date and end_date:
             filtered = [exp for exp in filtered if start_date <= exp["date"] <= end_date]
