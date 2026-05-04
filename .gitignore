@@ -1,0 +1,10 @@
+pycache/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+tasks.json
+.DS_Store
+*.log
